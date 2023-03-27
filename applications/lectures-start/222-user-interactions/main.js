@@ -1,15 +1,18 @@
-import {loadGLTF, loadAudio} from "../../libs/loader.js";
+import { mockWithVideo } from '../../libs/camera-mock.js';
+import { loadGLTF, loadAudio } from '../../libs/loader.js';
 const THREE = window.MINDAR.IMAGE.THREE;
 
 document.addEventListener('DOMContentLoaded', () => {
-  const start = async() => {
+  const start = async () => {
+    mockWithVideo('/applications/assets/mock-videos/musicband1.mp4');
+
     const mindarThree = new window.MINDAR.IMAGE.MindARThree({
       container: document.body,
       imageTargetSrc: '../../assets/targets/musicband.mind',
     });
-    const {renderer, scene, camera} = mindarThree;
+    const { renderer, scene, camera } = mindarThree;
 
-    const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
+    const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
     scene.add(light);
 
     const raccoon = await loadGLTF('../../assets/models/musicband-raccoon/scene.gltf');
@@ -23,13 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const listener = new THREE.AudioListener();
     camera.add(listener);
 
-    const audioClip = await loadAudio("../../assets/sounds/musicband-drum-set.mp3");
+    const audioClip = await loadAudio('../../assets/sounds/musicband-drum-set.mp3');
     const audio = new THREE.Audio(listener);
     audio.setBuffer(audioClip);
 
-    document.body.addEventListener("click", (e) => {
-      const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-      const mouseY = -1 * ((e.clientY / window.innerHeight) * 2 - 1);
+    document.body.addEventListener('click', (event) => {
+      const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      const mouseY = -1 * ((event.clientY / window.innerHeight) * 2 - 1);
       const mouse = new THREE.Vector2(mouseX, mouseY);
 
       const raycaster = new THREE.Raycaster();
@@ -38,17 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const intersects = raycaster.intersectObjects(scene.children, true);
 
       if (intersects.length > 0) {
-	let o = intersects[0].object;
+        let o = intersects[0].object;
 
-	while (o.parent && !o.userData.clickable) {
-	  o = o.parent;
-	}
+        while (o.parent && !o.userData.clickable) {
+          o = o.parent;
+        }
 
-	if (o.userData.clickable) {
-	  if (o === raccoon.scene) {
-	    audio.play();
-	  }
-	}
+        if (o.userData.clickable) {
+          if (o === raccoon.scene) {
+            audio.play();
+          }
+        }
       }
     });
 
@@ -56,6 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderer.setAnimationLoop(() => {
       renderer.render(scene, camera);
     });
-  }
+  };
   start();
 });
