@@ -1,17 +1,23 @@
-const THREE = window.MINDAR.IMAGE.THREE;
+const THREE = window.MINDAR.FACE.THREE;
 
 document.addEventListener('DOMContentLoaded', () => {
-  const start = async() => {
-    const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+  const start = async () => {
+    const mindarThree = new window.MINDAR.FACE.MindARThree({
       container: document.body,
-      imageTargetSrc: '../../assets/targets/course-banner.mind',
     });
-    const {renderer, scene, camera} = mindarThree;
+    const { renderer, scene, camera } = mindarThree;
+
+    const geometry = new THREE.SphereGeometry(0.1, 32, 16);
+    const material = new THREE.MeshBasicMaterial({ color: '#00ffff', transparent: true, opacity: 0.5 });
+    const sphere = new THREE.Mesh(geometry, material);
+
+    const anchor = mindarThree.addAnchor(1);
+    anchor.group.add(sphere);
 
     await mindarThree.start();
     renderer.setAnimationLoop(() => {
       renderer.render(scene, camera);
     });
-  }
+  };
   start();
 });
